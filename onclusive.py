@@ -22,28 +22,29 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 def enviar_alerta(nuevos_posts):
     if not nuevos_posts: return
     
-    # Prepara el contenido
     contenido = "Se han detectado nuevos posts en Wong Virales:\n\n"
     for post in nuevos_posts:
         contenido += f"Título: {post.get('title')}\nURL: {post.get('url')}\nInteracciones: {post.get('interactions')}\n\n"
     
-    # Envío mediante API de Resend
     headers = {
         "Authorization": f"Bearer {os.environ.get('RESEND_API_KEY')}",
         "Content-Type": "application/json"
     }
     payload = {
-        "from": "onboarding@resend.dev", # O tu dominio verificado
+        "from": "onboarding@resend.dev", 
         "to": os.environ.get("EMAIL_RECEIVER"),
-        "subject": "🚀 Nuevos virales detectados",
+        "subject": f"🚀 {len(nuevos_posts)} nuevo(s) viral(es) detectado(s)",
         "text": contenido
     }
     
     try:
-        requests.post("https://api.resend.com/emails", json=payload, headers=headers)
-        print("✅ Correo enviado vía API de Resend.")
+        response = requests.post("https://api.resend.com/emails", json=payload, headers=headers)
+        if response.status_code == 200:
+            print("✅ Correo enviado correctamente vía Resend.")
+        else:
+            print(f"❌ Error en Resend: {response.text}")
     except Exception as e:
-        print(f"❌ Error al enviar con Resend: {e}")
+        print(f"❌ Error al conectar con Resend: {e}")
 
 def ejecutar_extraccion():
     todos_los_datos = []
