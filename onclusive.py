@@ -38,6 +38,7 @@ def enviar_alerta(nuevos_posts):
     }
     
     try:
+        print(f"DEBUG: Resend Key length: {len(os.environ.get('RESEND_API_KEY', ''))}")
         response = requests.post("https://api.resend.com/emails", json=payload, headers=headers)
         if response.status_code == 200:
             print("✅ Correo enviado correctamente vía Resend.")
