@@ -2,8 +2,8 @@ name: Sincronizar Onclusive a Supabase
 
 on:
   schedule:
-    - cron: '0 10,12,15,18 * * *' # Ejecuta a las 10am, 12pm, 3pm, 6pm
-  workflow_dispatch: # Permite ejecución manual desde la pestaña 'Actions' en GitHub
+    - cron: '0 10,12,15,18 * * *'
+  workflow_dispatch:
 
 jobs:
   sincronizar:
@@ -26,7 +26,7 @@ jobs:
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           ONCLUSIVE_USER: ${{ secrets.ONCLUSIVE_USER }}
           ONCLUSIVE_PASS: ${{ secrets.ONCLUSIVE_PASS }}
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }} # <--- ESTA LÍNEA ES LA QUE FALTA
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
         run: python onclusive.py
         run: python onclusive.py
