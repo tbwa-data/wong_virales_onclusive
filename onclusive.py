@@ -9,12 +9,12 @@ from supabase import create_client
 
 # --- 1. CONFIGURACIÓN ---
 URL = "http://social.digimind.com/d/ap4/api/mentions"
-USER = os.environ.get("ONCLUSIVE_USER")
-PASSWORD = os.environ.get("ONCLUSIVE_PASS")
+USER = "aperez@tbwaperu.com" 
+PASSWORD = "Andre1come!"
 
 # Configuración de Supabase
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+SUPABASE_URL = "https://nkepnerncodumcfirunn.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rZXBuZXJuY29kdW1jZmlydW5uIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTYwODEyOCwiZXhwIjoyMDg1MTg0MTI4fQ.1Nsi48ci5CeOna2ndAjnZG1OOsoaVq3sY_7kCKkVgUw"
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def ejecutar_extraccion():
