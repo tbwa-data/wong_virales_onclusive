@@ -2,7 +2,6 @@ import os
 import requests
 import pandas as pd
 import time
-import smtplib
 from datetime import datetime
 from urllib.parse import unquote
 from requests.auth import HTTPBasicAuth
@@ -19,13 +18,10 @@ SUPABASE_URL = "https://nkepnerncodumcfirunn.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rZXBuZXJuY29kdW1jZmlydW5uIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTYwODEyOCwiZXhwIjoyMDg1MTg0MTI4fQ.1Nsi48ci5CeOna2ndAjnZG1OOsoaVq3sY_7kCKkVgUw"
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+# Configuración de Resend
+RESEND_API_KEY = "re_VS7CVTX4_PbXbxgbTKP6UVpz1r7hj5ZUp"
+
 def enviar_alerta(nuevos_posts):
-    key = os.environ.get('RESEND_API_KEY')
-    print(f"DEBUG: ¿La llave existe? {'SÍ' if key else 'NO'}")
-    if key:
-        print(f"DEBUG: Longitud de la llave: {len(key)}")
-        print(f"DEBUG: Primeros 4 caracteres: {key[:4]}")
-        
     if not nuevos_posts: return
     
     contenido = "Se han detectado nuevos posts en Wong Virales:\n\n"
@@ -33,18 +29,17 @@ def enviar_alerta(nuevos_posts):
         contenido += f"Título: {post.get('title')}\nURL: {post.get('url')}\nInteracciones: {post.get('interactions')}\n\n"
     
     headers = {
-        "Authorization": f"Bearer {os.environ.get('RESEND_API_KEY')}",
+        "Authorization": f"Bearer {RESEND_API_KEY}",
         "Content-Type": "application/json"
     }
     payload = {
         "from": "onboarding@resend.dev", 
-        "to": os.environ.get("EMAIL_RECEIVER"),
+        "to": "aperez@tbwaperu.com",
         "subject": f"🚀 {len(nuevos_posts)} nuevo(s) viral(es) detectado(s)",
         "text": contenido
     }
     
     try:
-        print(f"DEBUG: Resend Key length: {len(os.environ.get('RESEND_API_KEY', ''))}")
         response = requests.post("https://api.resend.com/emails", json=payload, headers=headers)
         if response.status_code == 200:
             print("✅ Correo enviado correctamente vía Resend.")
@@ -92,7 +87,6 @@ def ejecutar_extraccion():
             print(f"❌ Error en la API: {e}")
             break
 
-    # --- 2. PROCESAMIENTO Y FILTRADO DE NUEVOS DATOS ---
     if todos_los_datos:
         df = pd.DataFrame(todos_los_datos)
         df['date'] = pd.to_datetime(df['date'], unit='ms').dt.strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -104,12 +98,10 @@ def ejecutar_extraccion():
         
         registros = df[columnas_db].to_dict(orient='records')
         
-        # Comparación: Buscar IDs existentes en Supabase
         try:
             existentes = supabase.table("wong_virales").select("id").execute().data
             ids_db = [item['id'] for item in existentes]
             
-            # Solo los que NO están en la base de datos
             nuevos = [r for r in registros if r['id'] not in ids_db]
             
             if nuevos:
@@ -119,7 +111,7 @@ def ejecutar_extraccion():
             else:
                 print("No hay datos nuevos para sincronizar.")
         except Exception as e:
-            print(f"❌ Error en la lógica de comparación/subida: {e}")
+            print(f"❌ Error al subir a Supabase: {e}")
     else:
         print("No se encontraron registros en la API.")
 
