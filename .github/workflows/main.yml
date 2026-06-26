@@ -1,0 +1,29 @@
+name: Sincronizar Onclusive a Supabase
+
+on:
+  schedule:
+    - cron: '0 10,12,15,18 * * *' # Ejecuta a las 10am, 12pm, 3pm, 6pm
+  workflow_dispatch: # Permite ejecución manual desde la pestaña 'Actions' en GitHub
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Instalar dependencias
+        run: pip install requests pandas supabase
+
+      - name: Ejecutar onclusive.py
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          ONCLUSIVE_USER: ${{ secrets.ONCLUSIVE_USER }}
+          ONCLUSIVE_PASS: ${{ secrets.ONCLUSIVE_PASS }}
+        run: python onclusive.py
