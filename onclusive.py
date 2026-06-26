@@ -20,6 +20,12 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def enviar_alerta(nuevos_posts):
+    key = os.environ.get('RESEND_API_KEY')
+    print(f"DEBUG: ¿La llave existe? {'SÍ' if key else 'NO'}")
+    if key:
+        print(f"DEBUG: Longitud de la llave: {len(key)}")
+        print(f"DEBUG: Primeros 4 caracteres: {key[:4]}")
+        
     if not nuevos_posts: return
     
     contenido = "Se han detectado nuevos posts en Wong Virales:\n\n"
