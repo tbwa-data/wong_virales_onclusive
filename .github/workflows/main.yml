@@ -26,4 +26,7 @@ jobs:
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           ONCLUSIVE_USER: ${{ secrets.ONCLUSIVE_USER }}
           ONCLUSIVE_PASS: ${{ secrets.ONCLUSIVE_PASS }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }} # <--- ESTA LÍNEA ES LA QUE FALTA
+          EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+        run: python onclusive.py
         run: python onclusive.py
