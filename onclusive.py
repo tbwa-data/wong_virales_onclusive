@@ -22,25 +22,28 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 def enviar_alerta(nuevos_posts):
     if not nuevos_posts: return
     
-    msg = EmailMessage()
-    msg['Subject'] = f"🚀 {len(nuevos_posts)} nuevo(s) viral(es) detectado(s)"
-    msg['From'] = os.environ.get("EMAIL_SENDER")
-    msg['To'] = os.environ.get("EMAIL_RECEIVER")
-    
+    # Prepara el contenido
     contenido = "Se han detectado nuevos posts en Wong Virales:\n\n"
     for post in nuevos_posts:
         contenido += f"Título: {post.get('title')}\nURL: {post.get('url')}\nInteracciones: {post.get('interactions')}\n\n"
     
-    msg.set_content(contenido)
+    # Envío mediante API de Resend
+    headers = {
+        "Authorization": f"Bearer {os.environ.get('RESEND_API_KEY')}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "from": "onboarding@resend.dev", # O tu dominio verificado
+        "to": os.environ.get("EMAIL_RECEIVER"),
+        "subject": "🚀 Nuevos virales detectados",
+        "text": contenido
+    }
     
     try:
-        with smtplib.SMTP('smtp.office365.com', 587) as smtp:
-            smtp.starttls()
-            smtp.login(os.environ.get("EMAIL_SENDER"), os.environ.get("EMAIL_PASSWORD"))
-            smtp.send_message(msg)
-        print("✅ Correo enviado correctamente.")
+        requests.post("https://api.resend.com/emails", json=payload, headers=headers)
+        print("✅ Correo enviado vía API de Resend.")
     except Exception as e:
-        print(f"❌ Error al enviar correo: {e}")
+        print(f"❌ Error al enviar con Resend: {e}")
 
 def ejecutar_extraccion():
     todos_los_datos = []
